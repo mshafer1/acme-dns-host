@@ -1,9 +1,44 @@
 services:
+  backend:
+    # image: joohoi/acme-dns:v1.0
+    image: bash
+    restart: always
+    expose: !reset []
+    ports: !reset []
+    entrypoint: 
+     - bash
+     - "-c"
+    command: >
+      'while true; do sleep 1; done'
+    networks:
+      internal:
+        ipv4_address: 172.19.0.2
   web:
     image: nginx:mainline-alpine3.23
     ports:
       - "${PORT_PREFIX}443:443"
       - "${PORT_PREFIX}80:80"
+    expose: !reset []
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      internal:
+        ipv4_address: 172.19.0.3
+      external:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
+
+networks:
+  external:
+    driver: bridge
+  internal:
+    driver: macvlan
+    internal: true
+    # no/default parent
+    ipam:
+      config:
+        - subnet: "172.19.0.0/24"
+          ip_range: "172.19.0.0/24"
+          # no gateway
