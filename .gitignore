@@ -1,2 +1,4 @@
 certs/
 .env
+
+acme_dns_data/
