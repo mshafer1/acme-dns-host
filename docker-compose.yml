@@ -1,34 +1,63 @@
 services:
+  conf-render:
+    image: bhgedigital/envsubst@sha256:edc130d1f2cd066f68cbba01d7e467bda543785ce28e2b426be929d266f31b87 # v1.0-alpine3.6
+    entrypoint: ['sh', '-c']
+    env_file:
+      - .env
+    restart: "no"
+    volumes:
+      - ./acme_dns_config/config.cfg:/var/acme-dns-config.cf:ro
+      - acme_dns_config_store:/etc/acme-dns:rw
+    command:
+      - export USE_HEADER="${USE_HEADER:-true}" && cat /var/acme-dns-config.cf | envsubst | tee /etc/acme-dns/config.cfg
+
   backend:
-    # image: joohoi/acme-dns:v1.0
-    image: bash
+    image: joohoi/acme-dns:v1.0
     restart: always
-    expose: !reset []
-    ports: !reset []
-    entrypoint: 
-     - bash
-     - "-c"
-    command: >
-      'while true; do sleep 1; done'
+    depends_on:
+      conf-render:
+        condition: service_completed_successfully
     networks:
       internal:
         ipv4_address: 172.19.0.2
+    volumes:
+      - acme_dns_config_store:/etc/acme-dns:ro
+      - ./acme_dns_data:/var/lib/acme-dns
+  pub_dns:
+    image: strm/dnsmasq@sha256:dcf4c0aeb69ea6b9bca81314449d732ecd2ea021588d8a34d4be7c2304f89a39 # "latest", which is the only tag
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "${PORT_PREFIX}53:53/tcp"
+      - "${PORT_PREFIX}53:53/udp"
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - dnsmasq -d
+    volumes:
+      - ./dnsmasq_config/dnsmasq.conf:/etc/dnsmasq.conf:ro
+    networks:
+      external:
+      internal:
+        ipv4_address: 172.19.0.3
+
   web:
     image: nginx:mainline-alpine3.23
     ports:
-      - "${PORT_PREFIX}443:443"
       - "${PORT_PREFIX}80:80"
-    expose: !reset []
     restart: always
     depends_on:
       - backend
     networks:
       internal:
-        ipv4_address: 172.19.0.3
+        ipv4_address: 172.19.0.4
       external:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
+
+volumes:
+  acme_dns_config_store:
 
 networks:
   external:
