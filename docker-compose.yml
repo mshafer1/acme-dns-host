@@ -1,7 +1,6 @@
 services:
   conf-render:
     image: mshafer1/envsubst@sha256:cb01895a541a6fc77fdd6be397d9a46d2a5f21881d48fd4177033dbbb1e00ef0 # build-0.1_envsubst-0.24.1
-    entrypoint: ['sh', '-c']
     env_file:
       - .env
     restart: "no"
@@ -31,7 +30,6 @@ services:
     ports:
       - "${PORT_PREFIX}53:53/tcp"
       - "${PORT_PREFIX}53:53/udp"
-    entrypoint: ['/bin/sh', '-c']
     command:
       - dnsmasq -d
     volumes:
