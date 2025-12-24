@@ -1,0 +1,72 @@
+services:
+  conf-render:
+    image: mshafer1/envsubst@sha256:cb01895a541a6fc77fdd6be397d9a46d2a5f21881d48fd4177033dbbb1e00ef0 # build-0.1_envsubst-0.24.1
+    env_file:
+      - .env
+    restart: "no"
+    volumes:
+      - ./acme_dns_config/config.cfg:/var/acme-dns-config.cf:ro
+      - acme_dns_config_store:/etc/acme-dns:rw
+    command:
+      - export USE_HEADER="${USE_HEADER:-true}" && cat /var/acme-dns-config.cf | envsubst | tee /etc/acme-dns/config.cfg
+
+  backend:
+    image: joohoi/acme-dns@sha256:08435bf0c6cfe7c29816ff48beabcc333743b5bb060cae3867777d9b0d956517 #v1.0
+    restart: always
+    depends_on:
+      conf-render:
+        condition: service_completed_successfully
+    networks:
+      internal:
+        ipv4_address: 172.19.0.2
+    volumes:
+      - acme_dns_config_store:/etc/acme-dns:ro
+      - ./acme_dns_data:/var/lib/acme-dns
+  pub_dns:
+    image: mshafer1/dnsmasq@sha256:58bcccd9a3f4cd1615bba84eacbb243ec2f817d16be42fb4c22ac359296f5d86 # build-0.1_dnsmasq-2.91
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "${PORT_PREFIX}53:53/tcp"
+      - "${PORT_PREFIX}53:53/udp"
+    command:
+      - dnsmasq -d
+    volumes:
+      - ./dnsmasq_config/dnsmasq.conf:/etc/dnsmasq.conf:ro
+    networks:
+      external:
+      internal:
+        ipv4_address: 172.19.0.3
+
+  web:
+    image: nginx@sha256:8491795299c8e739b7fcc6285d531d9812ce2666e07bd3dd8db00020ad132295 # 1.29.2-alpine3.23
+    ports:
+      - "${PORT_PREFIX}443:443"
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      internal:
+        ipv4_address: 172.19.0.4
+      external:
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certs:/etc/nginx/client_certs:ro
+
+volumes:
+  acme_dns_config_store:
+
+networks:
+  external:
+    driver: bridge
+  internal:
+    driver: macvlan
+    internal: true
+    # no/default parent
+    ipam:
+      config:
+        - subnet: "172.19.0.0/24"
+          ip_range: "172.19.0.0/24"
+          # no gateway
