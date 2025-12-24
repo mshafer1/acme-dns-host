@@ -1,6 +1,14 @@
 # mTLS Nginx ACME DNS
 
+
 This provides an ACME DNS (Automatic Certificate Management Environment) server setup that requires [mutual TLS (mTLS)](https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/) for API access.
+
+# ⚠️ UPDATE ⚠️
+I did all this work, built this (and supporting infrastructure - including a Linode StackScript to deploy it) and then found out that the tunnel proxy I was planning to put in front of this (CloudFlare 0 Trust) doesn't support a "bring your own mTLS". 
+
+I can leverage their mTLS setup (which I didn't know about when I started this), but the tunnel strips off the client cert. I'm not sure what that means about the future of this project. For now, I'm going to go setup a simpler install that just uses CloudFlare's mTLS and proxies to my server (running joohoi/acme-dns directly).
+
+&nbsp;
 
 # Why?
 
@@ -24,3 +32,5 @@ Some docs used in building and testing this are:
 - https://docs.nginx.com/waf/configure/secure-mtls/
 - https://smallstep.com/hello-mtls/doc/client/requests
 - https://nginx.org/en/docs/http/ngx_http_ssl_module.html
+
+
