@@ -1,6 +1,6 @@
 services:
   conf-render:
-    image: bhgedigital/envsubst@sha256:edc130d1f2cd066f68cbba01d7e467bda543785ce28e2b426be929d266f31b87 # v1.0-alpine3.6
+    image: mshafer1/envsubst@sha256:cb01895a541a6fc77fdd6be397d9a46d2a5f21881d48fd4177033dbbb1e00ef0 # build-0.1_envsubst-0.24.1
     entrypoint: ['sh', '-c']
     env_file:
       - .env
@@ -12,7 +12,7 @@ services:
       - export USE_HEADER="${USE_HEADER:-true}" && cat /var/acme-dns-config.cf | envsubst | tee /etc/acme-dns/config.cfg
 
   backend:
-    image: joohoi/acme-dns:v1.0
+    image: joohoi/acme-dns@sha256:08435bf0c6cfe7c29816ff48beabcc333743b5bb060cae3867777d9b0d956517 #v1.0
     restart: always
     depends_on:
       conf-render:
@@ -24,7 +24,7 @@ services:
       - acme_dns_config_store:/etc/acme-dns:ro
       - ./acme_dns_data:/var/lib/acme-dns
   pub_dns:
-    image: strm/dnsmasq@sha256:dcf4c0aeb69ea6b9bca81314449d732ecd2ea021588d8a34d4be7c2304f89a39 # "latest", which is the only tag
+    image: mshafer1/dnsmasq@sha256:58bcccd9a3f4cd1615bba84eacbb243ec2f817d16be42fb4c22ac359296f5d86 # build-0.1_dnsmasq-2.91
     restart: always
     depends_on:
       - backend
