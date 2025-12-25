@@ -11,7 +11,7 @@ services:
       - export USE_HEADER="${USE_HEADER:-true}" && cat /var/acme-dns-config.cf | envsubst | tee /etc/acme-dns/config.cfg
 
   backend:
-    image: joohoi/acme-dns@sha256:08435bf0c6cfe7c29816ff48beabcc333743b5bb060cae3867777d9b0d956517 #v1.0
+    image: mshafer1/acme-dns-fork@sha256:c23463222538da79fa3ec82effe551f750157970c63035476a5ee5906d4ce258 #0.1.2
     restart: always
     depends_on:
       conf-render:
