@@ -32,7 +32,7 @@ To simplify deployment on [Linode by Akami (referral link)](https://www.linode.c
 
 [Stack Script direct link](https://cloud.linode.com/stackscripts/1980512)
 
-This should be able to be deployed by going through the dialog; however, for repetability, I wrapped it in a private StackScript like the following:
+This should be able to be deployed by going through the dialog; however, for repeatability, I wrapped it in a private StackScript like the following:
 
 ```bash
 #!/bin/bash
