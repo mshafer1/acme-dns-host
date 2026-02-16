@@ -1,6 +1,6 @@
 services:
   conf-render:
-    image: mshafer1/envsubst@sha256:cb01895a541a6fc77fdd6be397d9a46d2a5f21881d48fd4177033dbbb1e00ef0 # build-0.1_envsubst-0.24.1
+    image: mshafer1/envsubst@sha256:dcd0967594b04cc0da9918357b799e7054fa5cb515aa80a11c16f1343084dc91 # build-0.1_envsubst-0.24.1
     env_file:
       - .env
     restart: "no"
