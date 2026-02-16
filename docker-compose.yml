@@ -34,10 +34,17 @@ services:
       - dnsmasq -d
     volumes:
       - ./dnsmasq_config/dnsmasq.conf:/etc/dnsmasq.conf:ro
+      - ./dnsmasq_config/healthcheck.sh:/usr/local/bin/healthcheck.sh:ro
     networks:
       external:
       internal:
         ipv4_address: 172.19.0.3
+    healthcheck:
+      test: "/usr/local/bin/healthcheck.sh"
+      interval: 10s
+      timeout: 10s
+      retries: 2
+      start_period: 5s
 
   web:
     image: nginx:1.28.2-alpine3.23@sha256:15e96e59aa3b0aada3a121296e3bce117721f42d88f5f64217ef4b18f458c6ab
