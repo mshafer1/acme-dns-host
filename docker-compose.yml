@@ -23,7 +23,7 @@ services:
       - acme_dns_config_store:/etc/acme-dns:ro
       - ./acme_dns_data:/var/lib/acme-dns
   pub_dns:
-    image: mshafer1/dnsmasq@sha256:58bcccd9a3f4cd1615bba84eacbb243ec2f817d16be42fb4c22ac359296f5d86 # build-0.1_dnsmasq-2.91
+    image: mshafer1/dnsmasq@sha256:400c1a155ca985d501928480bfed9309163fa44b5393633da9232739c299cea1 # build-0.1_dnsmasq-2.91
     restart: unless-stopped
     depends_on:
       - backend
