@@ -1,6 +1,6 @@
 services:
   conf-render:
-    image: mshafer1/envsubst@sha256:dcd0967594b04cc0da9918357b799e7054fa5cb515aa80a11c16f1343084dc91 # build-0.1_envsubst-0.24.1
+    image: mshafer1/envsubst:envsubst_0.24.1@sha256:4fa05eaf6b5fc8a8fbc67276139eb55089506104539305dd361d85da14f731dc
     env_file:
       - .env
     restart: "no"
@@ -11,7 +11,7 @@ services:
       - export USE_HEADER="${USE_HEADER:-true}" && cat /var/acme-dns-config.cf | envsubst | tee /etc/acme-dns/config.cfg
 
   backend:
-    image: mshafer1/acme-dns-fork@sha256:001001f57ff26ca1fe961cf414b6970ace65f6e32b8810fdd4d809504abe5826 #0.1.3
+    image: mshafer1/acme-dns-fork:acme-dns-fork_0.1.4@sha256:001001f57ff26ca1fe961cf414b6970ace65f6e32b8810fdd4d809504abe5826
     restart: unless-stopped
     depends_on:
       conf-render:
@@ -23,7 +23,7 @@ services:
       - acme_dns_config_store:/etc/acme-dns:ro
       - ./acme_dns_data:/var/lib/acme-dns
   pub_dns:
-    image: mshafer1/dnsmasq@sha256:400c1a155ca985d501928480bfed9309163fa44b5393633da9232739c299cea1 # build-0.1_dnsmasq-2.91
+    image: mshafer1/dnsmasq:dnsmasq_2.91@sha256:1821ba59b25fe8e6aba3535c32189e297a040a53f53858a924bd2989ed2b4671
     restart: unless-stopped
     depends_on:
       - backend
@@ -40,7 +40,7 @@ services:
         ipv4_address: 172.19.0.3
 
   web:
-    image: nginx@sha256:8491795299c8e739b7fcc6285d531d9812ce2666e07bd3dd8db00020ad132295 # 1.29.2-alpine3.23
+    image: nginx:1.28.2-alpine3.23@sha256:15e96e59aa3b0aada3a121296e3bce117721f42d88f5f64217ef4b18f458c6ab
     ports:
       - "${PORT_PREFIX}80:80"
     restart: unless-stopped
