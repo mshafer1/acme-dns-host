@@ -66,7 +66,7 @@ services:
       - ./certs:/etc/nginx/client_certs:ro
 
   unhealthy_container_restarter:
-    image: docker:29-cli@sha256:4d48095e852fd13cea445172bea3c7f6038af1412e1f0748c986c5b369217a8f
+    image: docker:29-cli
     network_mode: none
     cap_drop:
       - ALL
