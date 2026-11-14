@@ -2,7 +2,7 @@
 
 set -eu
 
-if [ -z "${PUB_HEALTH_CHECK_DOMAINS}" ]; then
+if [ -z "${PUB_HEALTH_CHECK_DOMAINS:-}" ]; then
   echo "No domains to check"
   exit 0
 fi

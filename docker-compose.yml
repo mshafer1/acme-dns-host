@@ -71,7 +71,7 @@ services:
     cap_drop:
       - ALL
     volumes: [ "/var/run/docker.sock:/var/run/docker.sock" ]
-    command: [ "/bin/sh", "-c", "while true; do sleep 60; docker ps -q -f 'name=acme_dns-*' -f health=unhealthy | xargs --no-run-if-empty docker restart; done" ]
+    command: [ "/bin/sh", "-c", "while true; do sleep 60; docker ps -q -f 'label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}' -f 'label=com.docker.compose.service=pub_dns' -f health=unhealthy | xargs --no-run-if-empty docker restart; done" ]
     restart: unless-stopped
 
 volumes:
