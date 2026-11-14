@@ -23,8 +23,11 @@ services:
       - acme_dns_config_store:/etc/acme-dns:ro
       - ./acme_dns_data:/var/lib/acme-dns
   pub_dns:
-    image: mshafer1/dnsmasq:dnsmasq_2.91@sha256:1821ba59b25fe8e6aba3535c32189e297a040a53f53858a924bd2989ed2b4671
+    build:
+      dockerfile: dnsmasq_config/Dockerfile
     restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
       - backend
     ports:
@@ -34,10 +37,17 @@ services:
       - dnsmasq -d
     volumes:
       - ./dnsmasq_config/dnsmasq.conf:/etc/dnsmasq.conf:ro
+      - ./dnsmasq_config/healthcheck.sh:/usr/local/bin/healthcheck.sh:ro
     networks:
       external:
       internal:
         ipv4_address: 172.19.0.3
+    healthcheck:
+      test: "sh /usr/local/bin/healthcheck.sh"
+      interval: 10s
+      timeout: 10s
+      retries: 2
+      start_period: 5s
 
   web:
     image: nginx:1.31.2-alpine3.23@sha256:54f2a904c251d5a34adf545a72d32515a15e08418dae0266e23be2e18c66fefa
@@ -54,6 +64,15 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./certs:/etc/nginx/client_certs:ro
+
+  unhealthy_container_restarter:
+    image: docker:29-cli
+    network_mode: none
+    cap_drop:
+      - ALL
+    volumes: [ "/var/run/docker.sock:/var/run/docker.sock" ]
+    command: [ "/bin/sh", "-c", "while true; do sleep 60; docker ps -q -f 'label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}' -f 'label=com.docker.compose.service=pub_dns' -f health=unhealthy | xargs --no-run-if-empty docker restart; done" ]
+    restart: unless-stopped
 
 volumes:
   acme_dns_config_store:
