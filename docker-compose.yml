@@ -81,7 +81,7 @@ networks:
   external:
     driver: bridge
   internal:
-    driver: macvlan
+    driver: bridge
     internal: true
     # no/default parent
     ipam:
