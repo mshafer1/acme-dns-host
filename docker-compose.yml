@@ -80,12 +80,18 @@ volumes:
 networks:
   external:
     driver: bridge
+    ipam:
+      options:
+        parent: ${EXTERNAL_NETWORK_INTERFACE:-eth0}
+      config:
+        - subnet: "172.19.0.128/25"
+          ip_range: "172.19.0.128/25"
   internal:
     driver: bridge
     internal: true
     # no/default parent
     ipam:
       config:
-        - subnet: "172.19.0.0/24"
-          ip_range: "172.19.0.0/24"
+        - subnet: "172.19.0.0/25"
+          ip_range: "172.19.0.0/25"
           # no gateway
