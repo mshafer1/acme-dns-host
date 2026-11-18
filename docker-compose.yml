@@ -31,8 +31,8 @@ services:
     depends_on:
       - backend
     ports:
-      - "${PORT_PREFIX}53:53/tcp"
-      - "${PORT_PREFIX}53:53/udp"
+      - "${DNS_PORT_PREFIX}53:53/tcp"
+      - "${DNS_PORT_PREFIX}53:53/udp"
     command:
       - dnsmasq -d
     volumes:
@@ -52,7 +52,7 @@ services:
   web:
     image: nginx:1.31.2-alpine3.23@sha256:54f2a904c251d5a34adf545a72d32515a15e08418dae0266e23be2e18c66fefa
     ports:
-      - "${PORT_PREFIX}80:80"
+      - "${WEB_PORT_PREFIX}80:80"
     restart: unless-stopped
     depends_on:
       - backend
