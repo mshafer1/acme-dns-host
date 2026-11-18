@@ -4,6 +4,7 @@ services:
     env_file:
       - .env
     restart: "no"
+    network_mode: none
     volumes:
       - ./acme_dns_config/config.cfg:/var/acme-dns-config.cf:ro
       - acme_dns_config_store:/etc/acme-dns:rw
