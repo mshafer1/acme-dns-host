@@ -51,7 +51,7 @@ services:
       start_period: 5s
 
   web:
-    image: nginx:1.31.2-alpine3.23@sha256:54f2a904c251d5a34adf545a72d32515a15e08418dae0266e23be2e18c66fefa
+    image: nginx:1.30.7-alpine3.24-slim@sha256:8c950211a641ec5b23f265450517001f6bcca533666120ebe36cb4cff3d00a55
     ports:
       - "${WEB_PORT_PREFIX}80:80"
     restart: unless-stopped
